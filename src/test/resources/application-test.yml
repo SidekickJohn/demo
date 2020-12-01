@@ -1,0 +1,20 @@
+resilience4j:
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 5s
+        cancelRunningFuture: true
+    instances:
+      MY_RESILIENCE_KEY:
+        baseConfig: default
+  retry:
+    configs:
+      default:
+        maxRetryAttempts: 2
+        waitDuration: 100ms
+        retryExceptions:
+          - java.util.concurrent.TimeoutException
+    instances:
+      MY_RESILIENCE_KEY:
+        baseConfig: default
+      

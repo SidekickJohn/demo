@@ -32,7 +32,7 @@ public class CallExternalService {
 	
 	@TimeLimiter(name = "MY_RESILIENCE_KEY")
 	@Retry(name = "MY_RESILIENCE_KEY")
-	public CompletableFuture<Person> getPersonById(int id) {
+	public CompletableFuture<Person> getPersonById() {
 		Person person = new Person();
 		HttpHeaders headers = new HttpHeaders();
 		
