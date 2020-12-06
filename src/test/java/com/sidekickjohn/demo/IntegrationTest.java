@@ -29,6 +29,7 @@ import org.springframework.web.client.RestTemplate;
 import com.sidekickjohn.demo.boundary.SimpleRestEndpointController;
 import com.sidekickjohn.demo.control.CallExternalService;
 import com.sidekickjohn.demo.entity.Person;
+import com.sidekickjohn.demo.entity.Post;
 
 
 @RunWith(SpringRunner.class)
@@ -37,7 +38,7 @@ import com.sidekickjohn.demo.entity.Person;
 @ActiveProfiles("test")
 public class IntegrationTest {
 	private TestRestTemplate testRestTemplate;
-	public final String FANCY_URL = "https://my-fancy-url-doesnt-matter.com/person";
+	public final String FANCY_URL = "https://jsonplaceholder.typicode.com/posts/1";
 	private String apiUrl;
 	private HttpHeaders headers;
 	
@@ -63,11 +64,13 @@ public class IntegrationTest {
 	@Test
 	public void testShouldRetryOnceWhenTimelimitIsReached() {
 		// Arrange
-		Person mockPerson = new Person();
-		mockPerson.setId(1);
-		mockPerson.setFirstName("First");
-		mockPerson.setLastName("Last");
-		ResponseEntity<Person> mockResponse = new ResponseEntity<>(mockPerson, HttpStatus.OK);
+		Post mockPost = new Post();
+		mockPost.setId(1);
+		mockPost.setTitle("First");
+		mockPost.setBody("Last");
+		
+		
+		ResponseEntity<Post> mockResponse = new ResponseEntity<>(mockPost, HttpStatus.OK);
 			
 		
 		Answer customAnswer = new Answer() {
@@ -77,7 +80,7 @@ public class IntegrationTest {
 				invocationCount++;
 				if (invocationCount == 1) {
 					Thread.sleep(6000);
-					return new ResponseEntity<>(new Person(), HttpStatus.OK);
+					return new ResponseEntity<>(new Post(), HttpStatus.OK);
 				} else {
 					return mockResponse;
 				}
@@ -89,7 +92,7 @@ public class IntegrationTest {
 				FANCY_URL,
 				HttpMethod.GET,
 				new HttpEntity<>(headers),
-				new ParameterizedTypeReference<Person>() {});
+				new ParameterizedTypeReference<Post>() {});
 		
 		
 		// Act
@@ -107,13 +110,19 @@ public class IntegrationTest {
 		
 		
 		// Assert
+		Person expectedPerson = new Person();
+		expectedPerson.setId(1);
+		expectedPerson.setFirstName("First");
+		expectedPerson.setLastName("Last");
+		
 		verify(restTemplate, times(2)).exchange(
 				FANCY_URL,
 				HttpMethod.GET,
 				new HttpEntity<>(headers),
-				new ParameterizedTypeReference<Person>() {});
+				new ParameterizedTypeReference<Post>() {});
+		
 		Assert.assertNotNull(result);
-		Assert.assertEquals(mockPerson, result.getBody());		
+		Assert.assertEquals(expectedPerson, result.getBody());		
 		
 	}
 	
